@@ -1,22 +1,22 @@
-import { displayServerError, HideableElement } from './utils.js';
+import { displayError, HideableElement } from './utils.js';
 import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
 import SlimSelect from 'slim-select';
 import 'slim-select/styles';
 
+const errorTitle = '❌';
+const errorMessage = 'Oops! Something went wrong! Try reloading the page!';
+let breedSelectDataSet = false;
+
 const refs = {
-  breedSelect: document.querySelector('.breed-select'),
+  breedSelect: new HideableElement(
+    document.querySelector('.breed-select'),
+    'breed-select'
+  ),
   catInfo: new HideableElement(document.querySelector('.cat-info'), 'cat-info'),
   loader: new HideableElement(document.querySelector('.loader'), 'loader'),
 };
 
-const breedSelect = new SlimSelect({
-  select: refs.breedSelect,
-  events: {
-    afterChange: onBreedSelectChange,
-  },
-});
-
-breedSelect.disable();
+refs.breedSelect.hide();
 refs.catInfo.hide();
 
 fetchBreeds()
@@ -28,28 +28,42 @@ fetchBreeds()
       };
     });
 
+    const breedSelect = new SlimSelect({
+      select: refs.breedSelect.element,
+      events: {
+        afterChange: onBreedSelectChange,
+      },
+    });
+
     breedSelect.setData(options);
-    breedSelect.enable();
-    refs.catInfo.show();
+    refs.breedSelect.show();
   })
   .catch(function (error) {
-    displayServerError(error);
+    displayError(errorTitle, errorMessage);
   })
   .finally(() => {
     refs.loader.hide();
   });
 
 function onBreedSelectChange(options) {
+  if (!breedSelectDataSet) {
+    breedSelectDataSet = true;
+    return;
+  }
+
   refs.loader.show();
 
   const breedId = options[0].value;
+
   fetchCatByBreed(breedId)
     .then(response => {
       const cat = response.data[0];
       refs.catInfo.element.innerHTML = createCatInfoMarkup(cat);
+      refs.catInfo.show();
     })
     .catch(function (error) {
-      displayServerError(error);
+      refs.catInfo.hide();
+      displayError(errorTitle, errorMessage);
     })
     .finally(() => {
       refs.loader.hide();
