@@ -1,0 +1,30 @@
+.breed-select {
+  max-width: 495px;
+  margin: 20px;
+}
+
+.cat-info {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+  margin: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.cat-image {
+  max-width: 480px;
+  height: auto;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+.cat-info-text {
+  flex: 1;
+  max-width: 640px;
+}
+
+.text-bold {
+  font-weight: bold;
+}
